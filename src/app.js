@@ -22,9 +22,11 @@ const CountButton = createComponent(({ step }, { add }) => ({
     height: '24px',
     borderRadius: '50%',
     border: 'none',
-    background: 'lightgray',
+    background: '#84838375',
     color: 'white',
     flex: 'none',
+    fontWeight: 600,
+    cursor: 'pointer',
   }
 }), {
     actions: {
@@ -33,42 +35,57 @@ const CountButton = createComponent(({ step }, { add }) => ({
   });
 
 const CountBar = createComponent((_, { count }) => {
-  const fullValue = count;
-  const emptyValue = 1 - count;
-  const transition = 'all 0.3s'
+  const centerK = Math.abs(count - 0.5) / 0.5;
+  const hue = count * 100;
+  const lightness =  centerK * -20 + 90;
+  const saturation = centerK * 100
+  const gap = 24;
+  const width = 100;
 
   return {
     styles: {
-      width: '50px',
-      height: '10px'
+      width: `${width + gap}px`,
+      height: `${gap}px`,
+      marginLeft: `-${gap}px`,
+      marginRight: `-${gap}px`,
+      zIndex: -1,
+      position: 'relative',
+      borderRadius: '1000px',
+      boxShadow: 'rgba(0, 0, 0, 0.1) 0 0 2px inset',
+      background: 'rgba(0, 0, 0, 0.02)',
     },
     children: [
-      Row({
-        children: [
-          createComponent(({ size }) => ({
-            styles: {
-              flex: fullValue,
-              background: 'red',
-              transition
-            }
-          }))({ key: 'empty' }),
-          createComponent(({ size }) => ({
-            styles: {
-              flex: emptyValue,
-              background: 'none',
-              transition
-            }
-          }))({ key: 'full' }),
-        ],
-        key: 'count-bar-row'
-      })
+      createComponent(({ size }) => ({
+        tag: 'div',
+        styles: {
+          position: 'absolute',
+          width: '100%',
+          lineHeight: '24px',
+          textAlign: 'center',
+          fontFamily: 'arial',
+          zIndex: '2',
+          fontSize: '10px',
+          color: '#777',
+        },
+        children: `${Math.round(count * 100)}%`,
+      }))({ key: 'value' }),
+      createComponent(({ size }) => ({
+        styles: {
+          background: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+          transition: 'all 0.5s cubic-bezier(.17,.84,.44,1)',
+          width: '24px',
+          transform: `translateX(${width * count}px)`,
+          height: '100%',
+          borderRadius: '1000px'
+        }
+      }))({ key: 'fill' }),
     ]
   }
 }, {
   props: ['count']
 })
 
-export const App = createComponent((_, { count }) => ({
+export const App = createComponent(() => ({
   children: [
     Row({
       children: [
@@ -81,7 +98,7 @@ export const App = createComponent((_, { count }) => ({
     })
   ]
 }), {
-    props: ['count'],
-  })
+  // props: ['count']
+})
 
 
