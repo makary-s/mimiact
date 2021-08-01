@@ -85,17 +85,57 @@ const CountBar = createComponent((_, { count }) => {
   props: ['count']
 })
 
+const Boxes = createComponent((_, {count}) => ({
+  styles: {
+    position: 'relative'
+  },
+  children: [...Array(Math.round(count * 10))].map((_, i) => 
+    createComponent((_, __, ctx) => {
+      const {el, isMounted, isDeleting, update} = ctx
+      
+      const transitionDuration = 1000;
+      const left = el?.offsetLeft || 0;
+      const top = el?.offsetTop || 0;
+      
+      if (!isMounted) update();
+      ctx.deleteTimeout = transitionDuration;
+
+      return {
+        styles: {
+          display: 'inline-block',
+          width: '12.4px',
+          height: '12.4px',
+          position: isDeleting ? 'absolute' : '',
+          zIndex: '-1',
+          left: `${isDeleting ? left + 50 : left}px`,
+          top: `${top}px`,
+          background: isDeleting 
+            ? 'transparent'
+            : isMounted 
+              ? 'rgb(219, 219, 219)' 
+              : 'white',
+          borderRadius: '100px',
+          transition: `all ${transitionDuration}ms`,
+        }
+      }
+    })()
+  ),
+}), {
+  props: ['count']
+})
+
 export const App = createComponent(() => ({
   children: [
     Row({
       children: [
-        CountButton({ step: 0.1, key: 'add-btn' }),
+        CountButton({ step: -0.1, key: 'add-btn' }),
         CountBar({ key: 'count' }),
-        CountButton({ step: -0.1, key: 'sub-btn' }),
+        CountButton({ step: +0.1, key: 'sub-btn' }),
       ],
       alignItems: 'center',
-      key: 'root-row'
-    })
+      key: 'count-row'
+    }),
+    Boxes({key: 'boxes'}),
   ]
 }), {
   // props: ['count']
